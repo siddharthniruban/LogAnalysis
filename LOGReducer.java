@@ -17,7 +17,7 @@ public class LOGReducer extends Reducer<Text, Text, Text, Text>{
 
         Text timest = null;
         String ts1 = "01/Jan/1000:00:00:00";
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy:hh:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss");
         Date parsedDate1 = null;
         try {
             parsedDate1 = dateFormat.parse(ts1.toString());
@@ -41,6 +41,6 @@ public class LOGReducer extends Reducer<Text, Text, Text, Text>{
                 e.printStackTrace();
             }
         }
-        context.write(key, new Text(new SimpleDateFormat("dd/MMM/yyyy:hh:mm:ss").format(timestamp1)));
+        context.write(key, new Text(new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss").format(timestamp1)));
     }
 }
