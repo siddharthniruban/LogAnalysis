@@ -1,0 +1,36 @@
+Your brief project description (in no more than five sentences/bullet points):
+This dataset contains incidents derived from SFPD Crime Incident Reporting system. The data ranges from 1/1/2003 to 5/13/2015. 
+from this given detail insights like
+1. Amount of crime over years.months,hours,minutes
+2. Amount of crime per day of the week
+3. Amount of crime for each type
+4. Amount of crime over city
+5. Category wise crime over week
+
+Current status (what you did so far in no more than five sentences/bullet points):
+Data analysing and cleansing of data to remove null values.
+getting the year month and date from dates feature using spark scala.
+getting the list of category over months
+
+Plans (what you will do in no more than five sentences/bullet points):
+calculating the insights based in different feature values
+aggregating the results and store in file
+create scala function to store the result in file format in hive
+creating the scala file for calculating the result 
+
+CommonUtils.scala - 20
+CrimeInSights.scala - 30
+
+
+The training set and test set rotate every week, meaning week 1,3,5,7… belong to test set, week 2,4,6,8 belong to training set. There are 9 variables:
+
+
+Dates - timestamp of the crime incident
+DayOfWeek - the day of the week
+PdDistrict - name of the Police Department District
+Address - the approximate street address of the crime incident
+X - Longitude
+Y - Latitude
+Category - category of the crime incident (only in train.csv). 5 category
+Descript - detailed description of the crime incident (only in train.csv) - 5 category
+Resolution - how the crime incident was resolved (only in train.csv) - 5 category
