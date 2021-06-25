@@ -1,11 +1,86 @@
 Your brief project description (in no more than five sentences/bullet points):
 This dataset contains incidents derived from SFPD Crime Incident Reporting system. The data ranges from 1/1/2003 to 5/13/2015. 
 from this given detail insights like
-1. Amount of crime over years.months,hours,minutes
-2. Amount of crime per day of the week
-3. Amount of crime for each type
-4. Amount of crime over city
+var crimelogs = sc.textfile("/tmp/train.csv")
+var header = crimelogs.first()
+var crimewithoutheader = crimelogs.filter(x=>x!=header)
+var crimeMap = crimewithoutheader.map(x=>{var d = x.split(',');
+(d(0),d(1),d(2),d(3),d(4),d(5),d(6),d(7).toFloat,d(8).toFloat)})
+
+case class crimeClass(Dates: String,Category: String,Descript: String,DayOfWeek: String,PdDistrict: String,Resolution: String,Address: String,X:Float,Y:Float);
+var crimeDF = crimeMap.map(x=> crimeClass(x._1,x._2,x._3,x._4,x._5,x._6,x._7,x._8,x._9)).toDF();
+*****************************************************************************************************************************************************
+var crimeDF = spark.read.option("header", "true").csv("/tmp/train.csv")
+crimeDF.withColumn("Dates_new",to_timestamp(col("Dates"),"yyyy-MM-dd HH:mm:ss")).registerTempTable("crime_table")
+
+//1. Amount of crime over years,months,hours
+val crime_month = spark.sql("select month(dates_new) as month_of_crime,count(*) from crime_table group by month(dates_new) order by count(*) desc")
+val crime_year = spark.sql("select year(dates_new) as year_of_crime,count(*) from crime_table group by year(dates_new) order by count(*) desc")
+val crime_hour = spark.sql("select hour(dates_new) as hour_of_crime,count(*) from crime_table group by hour(dates_new) order by count(*) desc")
+crime_month.show(20)
+crime_year.show()
+crime_hour.show(24)
+
+//2. Amount of crime per day of the week
+var crime_day_of_week = spark.sql("select DayOfWeek,count(*) from crime_table group by dayofweek order by count(*) desc")
+crime_day_of_week.show
+//3. Amount of crime for each type
+var crime_Category = spark.sql("select Category,count(*) from crime_table group by Category order by count(*) desc ")
+crime_Category.show
+//4. Amount of crime over city
+var crime_District = spark.sql("select PdDistrict,count(*) from crime_table group by PdDistrict order by count(*) desc ")
+crime_District.show
 5. Category wise crime over week
+import org.apache.spark.sql.functions.{stddev_samp, stddev_pop}
+
+var distinctCategory = crimeDF.select("Category").distinct.collect
+distinctCategory.foreach(x=>{
+var dfSubset = crimeDF.filter(col("Category") === x.getString(0));
+var dfSubsetGrouped = dfSubset.groupBy("DayOfWeek","Category").count();
+//println(dfSubsetGrouped)
+var std = dfSubsetGrouped.agg(stddev_pop("count")).first.mkString.toDouble
+var mean = dfSubsetGrouped.agg(avg("count")).first.mkString.toDouble
+var cv = std / mean
+})
+
+for c in crimeDF("Category").unique(){
+var dfSubset = crimeDF(crimeDF("Category") == c)
+var dfSubsetGrouped = dfSubset.groupby("DayOfWeek")("Category").count()
+var std = dfSubsetGrouped.std()
+var mean = dfSubsetGrouped.mean()
+var cv = std / mean
+}
+
+// Function to find mean of given array.
+    def mean(var arr:Array[String], var n:Int):={println(arr)}
+    {
+        double sum = 0;
+         
+        for (int i = 0; i < n; i++)
+            sum = sum + arr[i];
+        return sum / n;
+    }
+     
+    // Function to find standard 
+    // deviation of given array.
+    static double standardDeviation(double arr[],
+                                            int n)
+    {
+        double sum = 0;
+         
+        for (int i = 0; i < n; i++)
+            sum = sum + (arr[i] - mean(arr, n)) *
+                            (arr[i] - mean(arr, n));
+     
+        return Math.sqrt(sum / (n - 1));
+    }
+     
+    // Function to find coefficient of variation.
+    static double coefficientOfVariation(double arr[],
+                                                int n)
+    {
+    return (standardDeviation(arr, n) / mean(arr, n));
+    }
 
 Current status (what you did so far in no more than five sentences/bullet points):
 Data analysing and cleansing of data to remove null values.
